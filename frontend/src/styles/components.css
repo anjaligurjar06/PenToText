@@ -1,0 +1,86 @@
+/* ----------------------------------------------------------------------- */
+/*  components.css — buttons, cards, badges, inputs, toast, misc widgets   */
+/* ----------------------------------------------------------------------- */
+
+/* Buttons */
+.ptt .btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  border-radius: 999px; border: 1px solid transparent;
+  padding: 12px 22px; font-size: 14.5px; font-weight: 600;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
+  white-space: nowrap;
+}
+.ptt .btn:active { transform: scale(.97); }
+.ptt .btn-primary { background: var(--indigo); color: var(--paper-card); }
+.ptt .btn-primary:hover { background: var(--indigo-deep); box-shadow: var(--shadow); }
+.ptt .btn-secondary { background: transparent; border-color: var(--ink); color: var(--ink); }
+.ptt .btn-secondary:hover { background: var(--ink); color: var(--paper-card); }
+.ptt .btn-ghost { background: transparent; color: var(--ink-soft); padding: 12px 14px; }
+.ptt .btn-ghost:hover { color: var(--ink); }
+.ptt .btn-sm { padding: 8px 16px; font-size: 13px; }
+.ptt .btn-block { width: 100%; justify-content: center; }
+.ptt .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Cards */
+.ptt .card {
+  background: var(--paper-card); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow-sm);
+}
+.ptt .badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; letter-spacing: .02em;
+  padding: 5px 11px; border-radius: 999px;
+}
+.ptt .badge-marigold { background: var(--marigold-soft); color: #7A5314; }
+.ptt .badge-sage { background: #E1EADD; color: #3E5A3B; }
+.ptt .badge-indigo { background: #E2E6F2; color: var(--indigo-deep); }
+.ptt .badge-brick { background: #F3DAD6; color: #7C2E24; }
+
+/* Inputs */
+.ptt .field-label { font-size: 13px; font-weight: 600; color: var(--ink-soft); margin-bottom: 7px; display: block; }
+.ptt .input, .ptt .textarea, .ptt .select {
+  width: 100%; border: 1.5px solid var(--line); background: var(--paper-card);
+  border-radius: var(--radius-sm); padding: 12px 14px; font-size: 14.5px; color: var(--ink);
+  transition: border-color .15s ease;
+}
+.ptt .input:focus, .ptt .textarea:focus, .ptt .select:focus {
+  outline: none; border-color: var(--indigo);
+}
+.ptt .textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+
+/* Logo mark */
+.ptt .logo { display: inline-flex; align-items: center; gap: 10px; font-weight: 600; font-size: 18px; }
+.ptt .logo-mark {
+  width: 30px; height: 30px; border-radius: 8px; background: var(--indigo);
+  display: inline-flex; align-items: center; justify-content: center; color: var(--paper-card);
+  font-family: 'Fraunces', serif; font-weight: 600; font-style: italic; font-size: 17px;
+  flex-shrink: 0;
+}
+
+/* Chips */
+.ptt .chip {
+  display: flex; align-items: center; gap: 9px; padding: 11px 16px; border-radius: 11px;
+  border: 1.5px solid var(--line); background: var(--paper-card); font-size: 14px; font-weight: 500; color: var(--ink-soft);
+}
+.ptt .chip.selected { border-color: var(--indigo); background: #E2E6F2; color: var(--indigo-deep); }
+.ptt .chip-row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.ptt .legend-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+/* Toast */
+.ptt .toast {
+  position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%);
+  background: var(--indigo-deep); color: #fff; padding: 13px 22px; border-radius: 999px;
+  font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 10px;
+  box-shadow: var(--shadow); z-index: 100; animation: toastin .25s ease;
+}
+@keyframes toastin { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%,0); } }
+
+/* Loading overlay */
+.ptt .loading-overlay {
+  position: fixed; inset: 0; background: rgba(28,35,51,.5); backdrop-filter: blur(2px);
+  display: flex; align-items: center; justify-content: center; z-index: 90;
+}
+.ptt .loading-card { background: var(--paper-card); padding: 34px 42px; border-radius: var(--radius); text-align: center; box-shadow: var(--shadow); }
+.ptt .spinner { width: 34px; height: 34px; border: 3px solid var(--line); border-top-color: var(--indigo); border-radius: 50%; margin: 0 auto 16px; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }

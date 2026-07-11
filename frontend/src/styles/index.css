@@ -1,0 +1,9 @@
+/* Single entry point — import this once in main.jsx.
+   Split into three files so each concern can be edited independently:
+   - tokens.css      → colors, fonts, spacing primitives, layout helpers
+   - components.css  → reusable UI pieces (buttons, cards, inputs, badges…)
+   - pages.css       → layout specific to each page/view + responsive rules */
+
+@import './tokens.css';
+@import './components.css';
+@import './pages.css';

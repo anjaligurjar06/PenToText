@@ -1,0 +1,57 @@
+/* ----------------------------------------------------------------------- */
+/*  tokens.css — design tokens, resets, and shared layout helpers          */
+/* ----------------------------------------------------------------------- */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,340..600;1,9..144,400..600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Caveat:wght@500;600&display=swap');
+
+.ptt {
+  --paper: #F1EEE6;
+  --paper-card: #FBFAF7;
+  --paper-deep: #E6E1D2;
+  --ink: #1C2333;
+  --ink-soft: #565F7E;
+  --ink-faint: #9096AC;
+  --indigo: #2B3A6B;
+  --indigo-deep: #1A2242;
+  --marigold: #E2A33D;
+  --marigold-soft: #F7E4B8;
+  --marigold-line: #C98A28;
+  --brick: #B8483C;
+  --sage: #6E8B6A;
+  --line: #DAD3BF;
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 22px;
+  --shadow-sm: 0 1px 2px rgba(28,35,51,.05);
+  --shadow: 0 10px 30px -14px rgba(27,34,66,.28);
+  font-family: 'Inter', sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+.ptt * { box-sizing: border-box; }
+.ptt .serif { font-family: 'Fraunces', serif; }
+.ptt .mono { font-family: 'IBM Plex Mono', monospace; }
+.ptt .script { font-family: 'Caveat', cursive; }
+.ptt a { color: inherit; text-decoration: none; }
+.ptt button { font-family: inherit; cursor: pointer; }
+.ptt input, .ptt textarea, .ptt select { font-family: inherit; }
+.ptt ::selection { background: var(--marigold-soft); }
+
+/* Layout helpers */
+.ptt .wrap { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+.ptt .row { display: flex; align-items: center; }
+.ptt .between { justify-content: space-between; }
+.ptt .center { justify-content: center; }
+.ptt .col { display: flex; flex-direction: column; }
+.ptt .grow { flex: 1 1 auto; }
+
+.ptt .eyebrow {
+  font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--indigo); font-weight: 500;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.ptt .eyebrow::before { content: ''; width: 16px; height: 1px; background: var(--marigold-line); display: inline-block; }
+
+.ptt .divider { height: 1px; background: var(--line); border: none; }
