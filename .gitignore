@@ -17,3 +17,9 @@ backend/.env
 # OS files
 .DS_Store
 Thumbs.db
+backend/.env
+backend/.venv/
+backend/venv/
+__pycache__/
+*.pyc
+backend/uploads/
