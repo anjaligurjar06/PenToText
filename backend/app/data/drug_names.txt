@@ -1,0 +1,15 @@
+# Small starter list. Replace or expand with a licensed drug reference dataset.
+Acetaminophen
+Amoxicillin
+Atorvastatin
+Azithromycin
+Cetirizine
+Ibuprofen
+Levothyroxine
+Lisinopril
+Metformin
+Omeprazole
+Paracetamol
+Prednisone
+Simvastatin
+
