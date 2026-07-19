@@ -9,9 +9,11 @@ import History from './pages/History.jsx';
 export default function App() {
   const [view, setView] = useState('landing');
   const [authMode, setAuthMode] = useState('login');
+  const [activeDocId, setActiveDocId] = useState(null);
 
-  function go(next, mode) {
-    if (next === 'auth' && mode) setAuthMode(mode);
+  function go(next, arg) {
+    if (next === 'auth' && arg) setAuthMode(arg);
+    if (next === 'review') setActiveDocId(arg ?? null);
     setView(next);
     window.scrollTo?.(0, 0);
   }
@@ -22,7 +24,7 @@ export default function App() {
       {view === 'auth' && <Auth go={go} initialMode={authMode} />}
       {view === 'dashboard' && <Dashboard go={go} />}
       {view === 'upload' && <UploadPage go={go} />}
-      {view === 'review' && <Review go={go} />}
+      {view === 'review' && <Review go={go} docId={activeDocId} />}
       {view === 'history' && <History go={go} />}
     </div>
   );

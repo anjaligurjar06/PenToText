@@ -1,36 +1,58 @@
+import { useEffect, useState } from 'react';
 import { Plus, FileText, ChevronRight } from 'lucide-react';
 import AppShell from '../components/AppShell.jsx';
-import { HISTORY_DOCS } from '../data.js';
+import { CATEGORIES } from '../data.js';
+import { api, getSessionUser } from '../api.js';
+
+function catLabel(catId) {
+  return CATEGORIES.find((c) => c.id === catId)?.label || catId;
+}
 
 export default function Dashboard({ go }) {
-  const recent = HISTORY_DOCS.slice(0, 4);
+  const [docs, setDocs] = useState([]);
+  const user = getSessionUser();
+
+  useEffect(() => {
+    api.listDocuments().then(setDocs).catch(() => {});
+  }, []);
+
+  const recent = docs.slice(0, 4);
+  const avgConfidence = docs.length
+    ? Math.round(docs.reduce((sum, d) => sum + (d.confidence || 0), 0) / docs.length)
+    : 0;
+  const thisMonth = docs.filter((d) => {
+    const created = new Date(d.created_at);
+    const now = new Date();
+    return created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear();
+  }).length;
+
   return (
     <AppShell view="dashboard" go={go}>
       <div className="topbar">
-        <div className="page-title serif">Good afternoon, Jordan</div>
+        <div className="page-title serif">Good afternoon{user?.name ? `, ${user.name.split(' ')[0]}` : ''}</div>
         <div className="page-sub">Here's what's happened since your last visit.</div>
       </div>
 
       <div className="stat-grid">
         <div className="card stat-card">
           <span className="lbl">Documents</span>
-          <b>24</b>
+          <b>{docs.length}</b>
           <span style={{ fontSize: 12.5, color: 'var(--ink-faint)' }}>transcribed total</span>
         </div>
         <div className="card stat-card">
           <span className="lbl">This month</span>
-          <b>7</b>
-          <span style={{ fontSize: 12.5, color: 'var(--ink-faint)' }}>+3 vs last month</span>
+          <b>{thisMonth}</b>
+          <span style={{ fontSize: 12.5, color: 'var(--ink-faint)' }}>documents</span>
         </div>
         <div className="card stat-card">
           <span className="lbl">Avg. confidence</span>
-          <b>91%</b>
+          <b>{docs.length ? `${avgConfidence}%` : '—'}</b>
           <span style={{ fontSize: 12.5, color: 'var(--ink-faint)' }}>across all documents</span>
         </div>
         <div className="card stat-card">
           <span className="lbl">Needs review</span>
-          <b>2</b>
-          <span style={{ fontSize: 12.5, color: 'var(--ink-faint)' }}>flagged words open</span>
+          <b>{docs.filter((d) => (d.confidence ?? 100) < 90).length}</b>
+          <span style={{ fontSize: 12.5, color: 'var(--ink-faint)' }}>documents flagged</span>
         </div>
       </div>
 
@@ -51,15 +73,20 @@ export default function Dashboard({ go }) {
           <span style={{ fontWeight: 600, fontSize: 15 }}>Recent transcriptions</span>
           <a style={{ fontSize: 13.5, color: 'var(--indigo)', fontWeight: 600, cursor: 'pointer' }} onClick={() => go('history')}>View all</a>
         </div>
+        {recent.length === 0 && (
+          <div style={{ padding: '30px 20px', textAlign: 'center', color: 'var(--ink-faint)', fontSize: 14 }}>
+            No documents yet — upload your first one to get started.
+          </div>
+        )}
         {recent.map((d) => (
-          <div className="doc-row" key={d.id} onClick={() => go('review')} style={{ cursor: 'pointer' }}>
+          <div className="doc-row" key={d.id} onClick={() => go('review', d.id)} style={{ cursor: 'pointer' }}>
             <span className="doc-thumb"><FileText size={17} /></span>
             <div>
               <div className="doc-title">{d.title}</div>
-              <div className="doc-meta">{d.category} · {d.date}</div>
+              <div className="doc-meta">{catLabel(d.category)} · {new Date(d.created_at).toLocaleDateString()}</div>
             </div>
-            <span className="badge badge-indigo">{d.category}</span>
-            <span className={`badge ${d.confidence >= 90 ? 'badge-sage' : 'badge-marigold'}`}>{d.confidence}% confidence</span>
+            <span className="badge badge-indigo">{catLabel(d.category)}</span>
+            <span className={`badge ${(d.confidence ?? 0) >= 90 ? 'badge-sage' : 'badge-marigold'}`}>{d.confidence ?? '—'}% confidence</span>
             <ChevronRight size={16} color="var(--ink-faint)" />
           </div>
         ))}

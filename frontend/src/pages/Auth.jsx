@@ -1,10 +1,33 @@
 import { useState } from 'react';
 import { User, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { Field } from '../components/Shared.jsx';
+import { api, setSession } from '../api.js';
 
 export default function Auth({ go, initialMode }) {
   const [mode, setMode] = useState(initialMode || 'login');
   const [showPw, setShowPw] = useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError('');
+    setSubmitting(true);
+    try {
+      const result = mode === 'login'
+        ? await api.login(email, password)
+        : await api.register(name, email, password);
+      setSession(result.access_token, result.user);
+      go('dashboard');
+    } catch (err) {
+      setError(err.message || 'Something went wrong');
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <div className="auth-shell">
@@ -35,32 +58,33 @@ export default function Auth({ go, initialMode }) {
             {mode === 'login' ? 'Log in to reach your dashboard and history.' : 'Create an account to start transcribing.'}
           </p>
 
-          <form className="col" style={{ gap: 16 }} onSubmit={(e) => { e.preventDefault(); go('dashboard'); }}>
+          <form className="col" style={{ gap: 16 }} onSubmit={handleSubmit}>
             {mode === 'signup' && (
               <Field label="Full name">
                 <div className="input-icon-wrap">
                   <User size={16} />
-                  <input className="input" placeholder="Jordan Ellis" required />
+                  <input className="input" placeholder="Jordan Ellis" value={name} onChange={(e) => setName(e.target.value)} required />
                 </div>
               </Field>
             )}
             <Field label="Email">
               <div className="input-icon-wrap">
                 <Mail size={16} />
-                <input className="input" type="email" placeholder="you@example.com" required />
+                <input className="input" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
               </div>
             </Field>
             <Field label="Password">
               <div className="input-icon-wrap">
                 <Lock size={16} />
-                <input className="input" type={showPw ? 'text' : 'password'} placeholder="••••••••" required />
+                <input className="input" type={showPw ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} minLength={8} required />
                 <button type="button" className="eye-btn" onClick={() => setShowPw(!showPw)}>
                   {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </Field>
-            <button className="btn btn-primary btn-block" type="submit" style={{ marginTop: 6 }}>
-              {mode === 'login' ? 'Log in' : 'Create account'} <ArrowRight size={16} />
+            {error && <div style={{ color: 'var(--brick)', fontSize: 13.5 }}>{error}</div>}
+            <button className="btn btn-primary btn-block" type="submit" disabled={submitting} style={{ marginTop: 6 }}>
+              {submitting ? 'Please wait…' : mode === 'login' ? 'Log in' : 'Create account'} <ArrowRight size={16} />
             </button>
           </form>
 
