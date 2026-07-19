@@ -3,17 +3,24 @@ import { FileText, ImagePlus, Sparkles } from 'lucide-react';
 import AppShell from '../components/AppShell.jsx';
 import { Field } from '../components/Shared.jsx';
 import { CATEGORIES } from '../data.js';
+import { api } from '../api.js';
 
 export default function UploadPage({ go }) {
   const [category, setCategory] = useState('prescription');
-  const [fileName, setFileName] = useState('');
+  const [file, setFile] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState('Reading the image…');
+  const [title, setTitle] = useState('');
+  const [context, setContext] = useState('');
+  const [notes, setNotes] = useState('');
+  const [error, setError] = useState('');
 
   const cat = CATEGORIES.find((c) => c.id === category);
+  const fileName = file?.name || '';
 
-  function handleSubmit() {
+  async function handleSubmit() {
+    setError('');
     setSubmitting(true);
     const msgs = ['Reading the image…', 'Matching context…', 'Typing it up…'];
     let i = 0;
@@ -22,11 +29,23 @@ export default function UploadPage({ go }) {
       i++;
       if (i < msgs.length) setLoadingMsg(msgs[i]);
     }, 500);
-    setTimeout(() => {
+
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      form.append('title', title || fileName);
+      form.append('category', category);
+      if (context) form.append('context', context);
+      if (notes) form.append('notes', notes);
+      const doc = await api.createDocument(form);
       clearInterval(interval);
       setSubmitting(false);
-      go('review');
-    }, 1600);
+      go('review', doc.id);
+    } catch (err) {
+      clearInterval(interval);
+      setSubmitting(false);
+      setError(err.message || 'Upload failed');
+    }
   }
 
   return (
@@ -43,13 +62,13 @@ export default function UploadPage({ go }) {
             className={`dropzone ${dragOver ? 'active' : ''}`}
             onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
             onDragLeave={() => setDragOver(false)}
-            onDrop={(e) => { e.preventDefault(); setDragOver(false); setFileName(e.dataTransfer.files?.[0]?.name || 'scanned-document.jpg'); }}
+            onDrop={(e) => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files?.[0]) setFile(e.dataTransfer.files[0]); }}
           >
             {fileName ? (
               <div className="col center" style={{ gap: 10 }}>
                 <span className="cat-icon" style={{ margin: '0 auto' }}><FileText size={20} /></span>
                 <div style={{ fontWeight: 600, fontSize: 14.5 }}>{fileName}</div>
-                <button className="btn btn-ghost btn-sm" onClick={() => setFileName('')}>Choose a different file</button>
+                <button className="btn btn-ghost btn-sm" onClick={() => setFile(null)}>Choose a different file</button>
               </div>
             ) : (
               <div className="col center" style={{ gap: 10 }}>
@@ -57,7 +76,7 @@ export default function UploadPage({ go }) {
                 <div style={{ fontWeight: 600, fontSize: 14.5 }}>Drag an image here, or</div>
                 <label className="btn btn-secondary btn-sm" style={{ cursor: 'pointer' }}>
                   Browse files
-                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => setFileName(e.target.files?.[0]?.name || 'scanned-document.jpg')} />
+                  <input type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={(e) => { if (e.target.files?.[0]) setFile(e.target.files[0]); }} />
                 </label>
                 <div style={{ fontSize: 12.5, color: 'var(--ink-faint)' }}>JPG, PNG, or PDF up to 20MB</div>
               </div>
@@ -80,24 +99,26 @@ export default function UploadPage({ go }) {
           <div className="u-step-label"><span className="u-step-num">3</span> Add context</div>
           <div className="col" style={{ gap: 16 }}>
             <Field label="Document title">
-              <input className="input" placeholder="e.g. Follow-up prescription, July 2026" />
+              <input className="input" placeholder="e.g. Follow-up prescription, July 2026" value={title} onChange={(e) => setTitle(e.target.value)} />
             </Field>
             <Field label={cat.hint}>
-              <input className="input" placeholder={
+              <input className="input" value={context} onChange={(e) => setContext(e.target.value)} placeholder={
                 category === 'prescription' ? 'e.g. Streptococcal pharyngitis' :
                 category === 'exam' ? 'e.g. Organic Chemistry' :
                 category === 'notes' ? 'e.g. Cardiology rotation' : 'Anything that helps — optional'
               } />
             </Field>
             <Field label="Additional notes (optional)">
-              <textarea className="textarea" placeholder="Anything else the transcription engine should know…" />
+              <textarea className="textarea" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Anything else the transcription engine should know…" />
             </Field>
           </div>
         </div>
 
+        {error && <div style={{ color: 'var(--brick)', fontSize: 13.5 }}>{error}</div>}
+
         <div className="row between">
           <button className="btn btn-ghost" onClick={() => go('dashboard')}>Cancel</button>
-          <button className="btn btn-primary" disabled={!fileName} onClick={handleSubmit}>
+          <button className="btn btn-primary" disabled={!fileName || submitting} onClick={handleSubmit}>
             <Sparkles size={16} /> Transcribe document
           </button>
         </div>
